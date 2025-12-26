@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BufferGeometry, BufferAttribute } from 'three'
 import { useTerrainStore } from '../stores/terrainStore'
 import { generateHeightmap } from '../lib/terrain/heightmap'
@@ -8,7 +8,7 @@ import { buildPositions, buildUVs, buildIndices } from '../lib/terrain/geometry'
 export function useTerrainGeometry(): BufferGeometry {
   const terrain = useTerrainStore((s) => s.terrain)
 
-  return useMemo(() => {
+  const geometry = useMemo(() => {
     const { resolution, worldSize, noise } = terrain
 
     // Generate heightmap from noise parameters
@@ -34,12 +34,21 @@ export function useTerrainGeometry(): BufferGeometry {
     const indices = buildIndices({ resolution })
 
     // Create Three.js BufferGeometry
-    const geometry = new BufferGeometry()
-    geometry.setAttribute('position', new BufferAttribute(positions, 3))
-    geometry.setAttribute('normal', new BufferAttribute(normals, 3))
-    geometry.setAttribute('uv', new BufferAttribute(uvs, 2))
-    geometry.setIndex(new BufferAttribute(indices, 1))
+    const geo = new BufferGeometry()
+    geo.setAttribute('position', new BufferAttribute(positions, 3))
+    geo.setAttribute('normal', new BufferAttribute(normals, 3))
+    geo.setAttribute('uv', new BufferAttribute(uvs, 2))
+    geo.setIndex(new BufferAttribute(indices, 1))
 
-    return geometry
+    return geo
   }, [terrain])
+
+  // Cleanup geometry when it changes or on unmount
+  useEffect(() => {
+    return () => {
+      geometry.dispose()
+    }
+  }, [geometry])
+
+  return geometry
 }

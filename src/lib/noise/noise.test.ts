@@ -192,4 +192,13 @@ describe('fbm', () => {
 
     expect(highFreqValue).toBeCloseTo(lowFreqScaledValue, 5)
   })
+
+  it('handles zero octaves gracefully', () => {
+    const zeroOctaveNoise: NoiseParams = { ...baseNoise, octaves: 0 }
+    const value = fbm({ x: 5, y: 5, noise: zeroOctaveNoise, permutation })
+
+    // Should return 0.5 (middle value), not NaN
+    expect(value).toBe(0.5)
+    expect(Number.isNaN(value)).toBe(false)
+  })
 })

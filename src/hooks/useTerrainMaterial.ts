@@ -63,7 +63,6 @@ export function useTerrainMaterial(): MeshStandardNodeMaterial {
     // Create the node material
     const mat = new MeshStandardNodeMaterial()
     mat.side = THREE.DoubleSide
-    mat.wireframe = wireframe
 
     // Get world position Y normalized to terrain height
     const worldY = positionWorld.y
@@ -78,9 +77,10 @@ export function useTerrainMaterial(): MeshStandardNodeMaterial {
     const scaledUV = mul(uv(), scale)
 
     // Sample textures (basic UV mapping for now)
-    const sample0 = texture(tex0, scaledUV)
-    const sample1 = texture(tex1, scaledUV)
-    const sample2 = texture(tex2, scaledUV)
+    // Use .rgb to extract vec3 from vec4 texture samples
+    const sample0 = texture(tex0, scaledUV).rgb
+    const sample1 = texture(tex1, scaledUV).rgb
+    const sample2 = texture(tex2, scaledUV).rgb
 
     // Height-based weights using smoothstep
     // Calculate height weights with smooth transitions
@@ -196,7 +196,6 @@ export function useTerrainMaterial(): MeshStandardNodeMaterial {
     tex2HeightEnd,
     tex2SlopeInfluence,
     textureScale,
-    wireframe,
     worldSize,
   ])
 
@@ -207,6 +206,12 @@ export function useTerrainMaterial(): MeshStandardNodeMaterial {
       result.material.dispose()
     }
   }, [result])
+
+  // Update wireframe without recreating material (intentional mutation of Three.js object)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    result.material.wireframe = wireframe
+  }, [result.material, wireframe])
 
   return result.material
 }

@@ -5,6 +5,10 @@ import type { CalculateSplatWeightsParams, SplatWeight } from '../../types'
  * Returns 0 if x <= edge0, 1 if x >= edge1, smooth interpolation in between.
  */
 function smoothstep(edge0: number, edge1: number, x: number): number {
+  // Guard against division by zero when edges are equal
+  if (edge0 === edge1) {
+    return x >= edge0 ? 1 : 0
+  }
   // Clamp x to [0, 1] range relative to edges
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)))
   // Smoothstep polynomial: 3t^2 - 2t^3

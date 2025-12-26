@@ -13,6 +13,11 @@ export function fbm(params: FbmParams): number {
   const { x, y, noise, permutation } = params
   const { frequency, octaves, lacunarity, persistence } = noise
 
+  // Guard against zero or negative octaves
+  if (octaves <= 0) {
+    return 0.5 // Return middle value
+  }
+
   let total = 0
   let amplitude = 1
   let freq = frequency

@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { useTerrainStore } from '../stores/terrainStore'
+import { SectionPanel } from './SectionPanel'
 import { SliderControl } from './SliderControl'
 import { ToggleControl } from './ToggleControl'
-import { SectionPanel } from './SectionPanel'
 
 // Resolution values as powers of 2
 const RESOLUTION_VALUES = [32, 64, 128, 256, 512]
@@ -92,7 +92,9 @@ export function ControlPanel() {
             <input
               type="number"
               value={terrain.noise.seed}
-              onChange={(e) => setNoise({ seed: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setNoise({ seed: parseInt(e.target.value) || 0 })
+              }
               className="w-full px-2 py-1 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:outline-none focus:border-blue-500"
             />
           </div>
@@ -153,26 +155,15 @@ export function ControlPanel() {
             step={0.01}
             onChange={(value) => setRender({ textureScale: value })}
           />
-          <ToggleControl
-            label="Tri-Planar"
-            checked={render.triplanarEnabled}
-            onChange={(checked) => setRender({ triplanarEnabled: checked })}
-          />
-          <ToggleControl
-            label="Height Blend"
-            checked={render.heightBlendEnabled}
-            onChange={(checked) => setRender({ heightBlendEnabled: checked })}
-          />
-          <ToggleControl
-            label="Anti-Tile"
-            checked={render.antiTileEnabled}
-            onChange={(checked) => setRender({ antiTileEnabled: checked })}
-          />
         </SectionPanel>
 
         {/* Texture Blend Sections */}
         {textures.map((tex, idx) => (
-          <SectionPanel key={tex.id} title={`${tex.name} Blend`} defaultOpen={false}>
+          <SectionPanel
+            key={tex.id}
+            title={`${tex.name} Blend`}
+            defaultOpen={false}
+          >
             <SliderControl
               label="Height Start"
               value={tex.heightStart}
@@ -180,7 +171,10 @@ export function ControlPanel() {
               max={1}
               step={0.05}
               onChange={(value) =>
-                setTexture({ slotId: idx as 0 | 1 | 2, updates: { heightStart: value } })
+                setTexture({
+                  slotId: idx as 0 | 1 | 2,
+                  updates: { heightStart: value },
+                })
               }
             />
             <SliderControl
@@ -190,7 +184,10 @@ export function ControlPanel() {
               max={1}
               step={0.05}
               onChange={(value) =>
-                setTexture({ slotId: idx as 0 | 1 | 2, updates: { heightEnd: value } })
+                setTexture({
+                  slotId: idx as 0 | 1 | 2,
+                  updates: { heightEnd: value },
+                })
               }
             />
             <SliderControl
@@ -200,7 +197,10 @@ export function ControlPanel() {
               max={1}
               step={0.05}
               onChange={(value) =>
-                setTexture({ slotId: idx as 0 | 1 | 2, updates: { slopeInfluence: value } })
+                setTexture({
+                  slotId: idx as 0 | 1 | 2,
+                  updates: { slopeInfluence: value },
+                })
               }
             />
           </SectionPanel>
