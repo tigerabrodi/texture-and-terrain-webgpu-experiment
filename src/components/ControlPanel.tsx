@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useTerrainStore } from '../stores/terrainStore'
 import { SliderControl } from './SliderControl'
 import { ToggleControl } from './ToggleControl'
@@ -15,9 +16,11 @@ function findClosestResolution(value: number): number {
 export function ControlPanel() {
   const terrain = useTerrainStore((state) => state.terrain)
   const render = useTerrainStore((state) => state.render)
+  const textures = useTerrainStore((state) => state.textures)
   const setNoise = useTerrainStore((state) => state.setNoise)
   const setTerrainSize = useTerrainStore((state) => state.setTerrainSize)
   const setRender = useTerrainStore((state) => state.setRender)
+  const setTexture = useTerrainStore((state) => state.setTexture)
   const resetToDefaults = useTerrainStore((state) => state.resetToDefaults)
 
   // Handle resolution slider with discrete power-of-2 steps
@@ -25,6 +28,28 @@ export function ControlPanel() {
     const resolution = findClosestResolution(value)
     setTerrainSize({ resolution })
   }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input
+      if (e.target instanceof HTMLInputElement) return
+
+      switch (e.key.toLowerCase()) {
+        case 'w':
+          setRender({ wireframe: !render.wireframe })
+          break
+        case 'r':
+          if (!e.ctrlKey && !e.metaKey) {
+            resetToDefaults()
+          }
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [render.wireframe, setRender, resetToDefaults])
 
   return (
     <div className="fixed left-4 top-4 bottom-4 w-[280px] bg-gray-900/95 backdrop-blur-sm rounded-lg border border-gray-700 overflow-hidden flex flex-col">
@@ -35,7 +60,7 @@ export function ControlPanel() {
           onClick={resetToDefaults}
           className="text-xs text-gray-400 hover:text-white px-2 py-1 rounded bg-gray-800 hover:bg-gray-700 transition-colors"
         >
-          Reset
+          Reset (R)
         </button>
       </div>
 
@@ -116,9 +141,17 @@ export function ControlPanel() {
         {/* Render Section */}
         <SectionPanel title="Render" defaultOpen>
           <ToggleControl
-            label="Wireframe"
+            label="Wireframe (W)"
             checked={render.wireframe}
             onChange={(checked) => setRender({ wireframe: checked })}
+          />
+          <SliderControl
+            label="Texture Scale"
+            value={render.textureScale}
+            min={0.01}
+            max={1}
+            step={0.01}
+            onChange={(value) => setRender({ textureScale: value })}
           />
           <ToggleControl
             label="Tri-Planar"
@@ -136,6 +169,47 @@ export function ControlPanel() {
             onChange={(checked) => setRender({ antiTileEnabled: checked })}
           />
         </SectionPanel>
+
+        {/* Texture Blend Sections */}
+        {textures.map((tex, idx) => (
+          <SectionPanel key={tex.id} title={`${tex.name} Blend`} defaultOpen={false}>
+            <SliderControl
+              label="Height Start"
+              value={tex.heightStart}
+              min={0}
+              max={1}
+              step={0.05}
+              onChange={(value) =>
+                setTexture({ slotId: idx as 0 | 1 | 2, updates: { heightStart: value } })
+              }
+            />
+            <SliderControl
+              label="Height End"
+              value={tex.heightEnd}
+              min={0}
+              max={1}
+              step={0.05}
+              onChange={(value) =>
+                setTexture({ slotId: idx as 0 | 1 | 2, updates: { heightEnd: value } })
+              }
+            />
+            <SliderControl
+              label="Slope Influence"
+              value={tex.slopeInfluence}
+              min={0}
+              max={1}
+              step={0.05}
+              onChange={(value) =>
+                setTexture({ slotId: idx as 0 | 1 | 2, updates: { slopeInfluence: value } })
+              }
+            />
+          </SectionPanel>
+        ))}
+      </div>
+
+      {/* Keyboard hints */}
+      <div className="p-2 border-t border-gray-700 text-xs text-gray-500 text-center">
+        W: Wireframe | R: Reset
       </div>
     </div>
   )
