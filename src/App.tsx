@@ -1,5 +1,14 @@
+import { WebGPUCanvas } from './components/WebGPUCanvas'
+import { TerrainMesh } from './components/TerrainMesh'
+
 function App() {
-  return <div>hello World</div>
+  return (
+    <div className="h-screen w-screen">
+      <WebGPUCanvas>
+        <TerrainMesh />
+      </WebGPUCanvas>
+    </div>
+  )
 }
 
 export default App
