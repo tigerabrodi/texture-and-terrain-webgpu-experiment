@@ -1,17 +1,9 @@
 import { useTerrainGeometry } from '../hooks/useTerrainGeometry'
-import { useTerrainStore } from '../stores/terrainStore'
+import { useTerrainMaterial } from '../hooks/useTerrainMaterial'
 
 export function TerrainMesh() {
   const geometry = useTerrainGeometry()
-  const wireframe = useTerrainStore((s) => s.render.wireframe)
+  const material = useTerrainMaterial()
 
-  return (
-    <mesh geometry={geometry}>
-      <meshStandardMaterial
-        color="#4a7c4e"
-        wireframe={wireframe}
-        flatShading={false}
-      />
-    </mesh>
-  )
+  return <mesh geometry={geometry} material={material} />
 }
